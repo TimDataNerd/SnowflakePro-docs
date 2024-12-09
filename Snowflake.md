@@ -1,7 +1,5 @@
 # ARCHITECTURE
 
-Database replication is available on all Snowflake editions.
-
 Snowflake micropartitions are immutable, they are created in the order in which data arrives.
 
 The data is kept in columnar format. Columns may overlap accross the micropartitions.
@@ -10,7 +8,7 @@ Compute and storage can be scaled independently.
 
 Snowflake has a hybrid shared-disk and shared-nothing architecture. 
 
-DATA_RETENTION_TIME_IN_DAYS can be applied on accounts, databases, schemas and individual tables.
+_DATA_RETENTION_TIME_IN_DAYS_ can be applied on accounts, databases, schemas and individual tables.
 
 Data retention time can be set up to 90 days starting from Enterprise edition.
 
@@ -22,8 +20,8 @@ Snowflake account types :
 
 The 3 Snowflake Multi-Cluster Architecture layers :
 	1. Cloud Service layer (security, authentification and metadata storage).
-    * Cloud service layer is only charged when it is used for more than 10% of daily warehouses usage.
-    * The service layer is responsible for authentification, metadata managment and query optimization.
+    1. Cloud service layer is only charged when it is used for more than 10% of daily warehouses usage.
+    2. The service layer is responsible for authentification, metadata managment and query optimization.
 	2. Query / Compute layer (warehouses).
 	3. Storage Layer (databases and disks)
 
@@ -35,7 +33,7 @@ A Snowflake account can only exist in one geographical region.
 
 ## METADATA OPERATIONS
 
-_HyperLogLog_ functions allows to get a quick estimate the number of unique values in a column.
+_HyperLogLog_ function allows to get a quick estimate of the number of unique values in a column.
 
 ## WAREHOUSES
 
@@ -109,52 +107,6 @@ Objects added into a shared database become immidiately available for the consum
 The same account can simultaneously share and consume data.
 
 _SYSTEM$IS_LISTING_PURCHASED_ allows to limit access to only paying customers.
-
-## STORED PROCEDURES & SNOWFLAKE SCRIPTING
-
-Stored Procedures can extend system's functionality with procedural code,
-can call user information such as session variables and are generally used for administrative operations.
-
-A stored procedure runs either with the caller's rights or with the owner's rights, **but not both**.
-
-Objects created with a script are available outside of the script, but not the variables.
-
-We can use if/else case.
-
-We can use loops like FOR, REPEAT, WHILE and LOOP.
-
-Structure:
-
-```SQL
-
-DECLARE <variables>
-...
-BEGIN [TRANSACTION]
-...
-EXCEPTION <exception handling>
-...
-END [TRANSACTION];
-
-```
-
-Example:
-
-```SQL
-CREATE PROCEDURE aclc_area()
-  RETURNS float
-  LANGUAGE SQL
-  AS
-$$ <in UI only>
-DECLARE
-length_a float;
-area float;
-BEGIN TRANSACTION
-length_a := 4;
-area := length_a * length_a;
-RETURN area
-END TRANSACTION;
-$$ <in UI only>
-```
 
 # QUERY OPTIMIZATION
 
@@ -310,6 +262,80 @@ _MINS_TO_BYPASS_NETWORK_POLICY_ can be modified **only by Snowflake support**.
 
 # DATA TRANSFORMATION
 
+## SNOWSQL
+
+When using SnowSQL CLI I can use any role that is available to me.
+
+## SPILLING
+
+To prevent data spilling, we should process data in smaller batches and use larger warehouses.
+
+## TASKS
+
+Tasks require compute resources to be executed. We can use Snowflake-managed (serverless) or User-managed modes (warehouse).
+
+## UDFs
+
+Secure UDFs hide their definition from unauthorized users and bypass query optimization.
+
+UDF only runs as the **function owner**.
+
+UDFs **do not** support DDL and DML expressions.
+
+## STORED PROCEDURES & SNOWFLAKE SCRIPTING
+
+Stored Procedures can extend system's functionality with procedural code,
+can call user information such as session variables and are generally used for administrative operations.
+
+A stored procedure runs either with the caller's rights or with the owner's rights, **but not both**.
+
+Objects created with a script are available outside of the script, but not the variables.
+
+We can use if/else case.
+
+We can use loops like FOR, REPEAT, WHILE and LOOP.
+
+Structure:
+
+```SQL
+
+DECLARE <variables>
+...
+BEGIN [TRANSACTION]
+...
+EXCEPTION <exception handling>
+...
+END [TRANSACTION];
+
+```
+
+Example:
+
+```SQL
+CREATE PROCEDURE aclc_area()
+  RETURNS float
+  LANGUAGE SQL
+  AS
+$$ <in UI only>
+DECLARE
+length_a float;
+area float;
+BEGIN TRANSACTION
+length_a := 4;
+area := length_a * length_a;
+RETURN area
+END TRANSACTION;
+$$ <in UI only>
+```
+
+## REPLICATION
+
+Database replication is available on all Snowflake editions.
+
+Stages, temporary tables, tasks, pipes and external tables are **not supported for data replication**.
+
+# DATA LOADING AND UNLOADING
+
 The Formats, supported by Snowflake:
  * Semi-structured:
 	- ORC
@@ -326,27 +352,7 @@ Recommended compressed file size in Snowflake : 100-250 Mb.
 
 Uncompressed size is around 50-500 Mb.
 
-## SNOWSQL
-
-When using SnowSQL CLI I can use any role that is available to me.
-
-## VARIANT PARSING
-
-One variant can only be 16 MB uncompressed.
-
-We use $<COLUMN_NUMBER>: or <COLUMN_NAME>: to access the first element and dots (.) to access all the susequent elements.
-
-## SPILLING
-
-To prevent data spilling, we should process data in smaller batches and use larger warehouses.
-
-## UDFs
-
-Secure UDFs hide their definition from unauthorized users and bypass query optimization.
-
-UDF only runs as the **function owner**.
-
-## COPY INTO
+### COPY INTO
 
 _COPY INTO_ only supports basic data transformations:
   * Column reordering
@@ -354,7 +360,9 @@ _COPY INTO_ only supports basic data transformations:
   * Casts
   * Truncating text strings that exceed the target column length.
 
-The VALIDATE function allows a user to view all the errors occurred during the last _COPY INTO_ execution.
+_OBJECT_CONSTRUCT_ function is used along with _COPY_ command to transform the rows into a single VARIANT column.
+
+The _VALIDATE_ function allows a user to view all the errors occurred during the last _COPY INTO_ execution.
 
 When _COPY INTO_ <TABLE> value _ON_ERROR_ is set to _CONTINUE_, the file will be uploaded even if errors are found.
 
@@ -362,4 +370,12 @@ The default value of _ON_ERROR_ is _ABORT_STATEMENT_.
 
 We can use _FILES_ property to set one or multiple specific files to load.
 
+Snowflake keeps the batch load history from stages for **64 days**.
+
 The _VALIDATION_MODE_ doesn't allow to transform data during loading.
+
+## VARIANT PARSING
+
+One variant can only be 16 MB uncompressed.
+
+We use $<COLUMN_NUMBER>: or <COLUMN_NAME>: to access the first element and dots (.) to access all the susequent elements.
