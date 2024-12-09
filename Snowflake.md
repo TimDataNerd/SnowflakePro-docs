@@ -19,13 +19,11 @@ Snowflake account types :
   * Virtual Private Snowflake (no sharing capabilities for the last one)
 
 The 3 Snowflake Multi-Cluster Architecture layers :
-	1. Cloud Service layer (security, authentification and metadata storage).
-	2. Query / Compute layer (warehouses).
-	3. Storage Layer (databases and disks)
-
-Cloud service layer is only charged when it is used for more than 10% of daily warehouses usage.
-
-The service layer is responsible for authentification, metadata managment and query optimization.
+1. Cloud Service layer (security, authentification and metadata storage).
+   1. Cloud service layer is only charged when it is used for more than 10% of daily warehouses usage.
+   2. The service layer is responsible for authentification, metadata managment and query optimization.
+2. Query / Compute layer (warehouses).
+3. Storage Layer (databases and disks)
 
 The usage metrics views in Snowflake db are available for 12 months.  
 
