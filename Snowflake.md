@@ -63,7 +63,7 @@ Resource monitors can be applied on an account level, on one or more warehouses.
 
 Resource monitors don't overwrite one another. Several monitors can be applied on the same object.
 
-## ROLES AND privilegeS
+## ROLES AND PRIVILEGES
 
 In order to clone an object, the privileges vary :
   - Tables: _SELECT_  
