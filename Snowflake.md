@@ -1,8 +1,8 @@
 # ARCHITECTURE
 
-Snowflake micropartitions are immutable, they are created in the order in which data arrives.
+Snowflake micro-partitions are immutable, they are created in the order in which data arrives.
 
-The data is kept in columnar format. Columns may overlap accross the micropartitions.
+The data is kept in columnar format. Columns may overlap across the micro-partitions.
 
 Compute and storage can be scaled independently.
 
@@ -16,18 +16,16 @@ Snowflake account types :
   * Standard
   * Enterprise
   * Business Critical
-  * Virtual Private Snowflake (no sharing capabilities for the last one)
+  * Virtual Private Snowflake (no sharing capabilities for this one)
 
 The 3 Snowflake Multi-Cluster Architecture layers :
 1. Cloud Service layer (security, authentification and metadata storage).
    1. Cloud service layer is only charged when it is used for more than 10% of daily warehouses usage.
-   2. The service layer is responsible for authentification, metadata managment and query optimization.
+   2. The service layer is responsible for authentification, metadata management and query optimization.
 2. Query / Compute layer (warehouses).
 3. Storage Layer (databases and disks)
 
 The usage metrics views in Snowflake db are available for 12 months.  
-
-Each created database automatically contains an information schema.
 
 A Snowflake account can only exist in one geographical region.
 
@@ -37,51 +35,55 @@ _HyperLogLog_ function allows to get a quick estimate of the number of unique va
 
 ## WAREHOUSES
 
-Snowflake warehouses have a T-shirt like sizing sytem with XS costing 1 credit per minute. 2 for S, 4 for M, 8 for L.
+Snowflake warehouses have a T-shirt like sizing system with XS costing 1 credit per minute. 2 for S, 4 for M, 8 for L.
 
 Serverless can use 2X-Large as the max warehouse.
 
 If a warehouse gets suspended, only idle Resources are shut down.
-The compute resources that are still in use will remain so until all the queries are finished.
+The compute resources that are still in use and will remain so until all the queries are finished.
 
 ## INFORMATION SCHEMA
+
+Each created database automatically contains an information schema.
 
 _INFORMATION_SCHEMA_ contains database-level and account-level information.
 
 _INFORMATION_SCHEMA_ doesn't contain information about dropped objects.
 
-_AUTO_REFRESH_REGISTRATION_HISTORY_ table function shows histroy of data files loaded into the metadata of
+_AUTO_REFRESH_REGISTRATION_HISTORY_ table function shows history of data files loaded into the metadata of
 specific objects as well as the credits billed for those operations.
 
 ## RESOURCE MONITORS
 
 By default, only _ACCOUNTADMIN_ has the right to create monitors.
 
-_ACCOUNTADMIN_ can grant _MODIFY_ and _MONITOR_ priviledges to another user.
+_ACCOUNTADMIN_ can grant _MODIFY_ and _MONITOR_ privileges to another user.
 
 Resource monitors can be applied on an account level, on one or more warehouses.
 
-## ROLES AND PRIVILEDGES
+Resource monitors don't overwrite one another. Several monitors can be applied on the same object.
 
-In order to clone an object, the priviledges vary :
-  - Tables:_SELECT_  
-  - Pipes, streams, tasks:_OWNERSHIP_  
-  - Others:_USAGE_  
+## ROLES AND privilegeS
 
-When cloning an object, only the subsequent object priviledges are cloned,
-not the object's istelf.
+In order to clone an object, the privileges vary :
+  - Tables: _SELECT_  
+  - Pipes, streams, tasks: _OWNERSHIP_  
+  - Others: _USAGE_  
 
-_SYSADMIN_ role can only create warehouses and databases.
+When cloning an object, only the subsequent object privileges are cloned,
+not the object's itself.
 
 _ACCOUNTADMIN_ is the **highest role** in the role hierarchy.
+
+_SYSADMIN_ role can only create warehouses and databases.
 
 _ORGADMIN_ can only only create and delete accounts. It cannot view contents of an account and thus, it cannot work with the data.
 
 Roles can be granted to other roles.
 
-Priviledges can only be granted to roles.
+privileges can only be granted to roles.
 
-_OPERATE_ priviledge allows to resume and suspend tasks.
+_OPERATE_ privilege allows to resume and suspend tasks.
 
 ## SHARES
 
@@ -89,11 +91,11 @@ Snowflake Partner Connect allows to transfer Snowflake data to a business partne
 
 A share doesn't have an expiration date.
 
-By default, only _ACCOUNTADMIN_ has the priviledge to create shares.
+By default, only _ACCOUNTADMIN_ has the privilege to create shares.
 
-The CREATE SHARE priviledge can be granted to other roles.
+The CREATE SHARE privilege can be granted to other roles.
 
-When sharing a table or a view, _SELECT_ permission hast to be given on to it and _USAGE_ is to be given on subsequent shema and database.
+When sharing a table or a view, _SELECT_ permission hast to be given on to it and _USAGE_ is to be given on subsequent schema and database.
 
 Objects that can be shared:
  * Tables
@@ -102,7 +104,7 @@ Objects that can be shared:
  * Secure materialized views
  * Secure UDFs
 
-Objects added into a shared database become immidiately available for the consumers.
+Objects added into a shared database become immediately available for the consumers.
 
 The same account can simultaneously share and consume data.
 
@@ -116,7 +118,7 @@ even if the worksheets are inactive.
 In order to use the cached data in Snowflake Cloud metadata storage,
 the user should have all the necessary privileges and the query must exactly match the previous one. 
 
-Query optimization improves the performance of **point lookup queries** (very selective lookups).
+Query optimization improves the performance of **point lookup queries** (WHERE, IN etc).
 
 ## SNOWPIPE
 
@@ -126,7 +128,7 @@ _PIPE_USAGE_HISTORY_ schema in _ACCOUNT_USAGE_ shows the use of snowpipes.
 
 Snowpipe loads metadata along with files. A file with the same name cannot be loaded twice.
 
-The _INSERT_ONLY_ tipe of pipes only works with external tables.
+The _INSERT_ONLY_ type of pipes only works with external tables.
 
 ## CACHING
 
@@ -143,7 +145,7 @@ _@~_ for user stage,  _@%<TABLE_NAME>_ for a table stage,  _@<STAGE_NAME>_ for i
 
 If the _PURGE_ option is set to TRUE, after a successful load into tables all the staged files are removed from the external stage.
 
-_PUT_ is used to lad data into **internal** stage. _GET_ is used to download data from **internal** stage.
+_PUT_ is used to load data into **internal** stage. _GET_ is used to download data from **internal** stage.
 
 ### DIRECTORY TABLES
 
@@ -161,7 +163,7 @@ Materialized views can be only applied to _SELECT_ queries on one single table (
 
 Materialized views are applicable on external tables, as well as internal queries that are frequently used and are sufficiently complex.
 
-Materialized views cost on both **storage** and **serverles**.
+Materialized views cost on both **storage** and **serverless**.
 
 ## CLUSTERING
 
@@ -174,17 +176,17 @@ The recommended number of columns per clustering key: 3 or 4.
 When choosing columns for clustering, we should prefer columns that participate in _WHEN_ and _JOIN_ queries.
 This improves pruning.
 
-The colums for clustering should have medium cardinality (not too low, not too high).
+The columns for clustering should have medium cardinality (not too low, not too high).
 
-Clustering keys imporve queriy performance as well as table maintenance.
+Clustering keys improve query performance as well as table maintenance.
 
 # STORAGE
 
 ## TABLES
 
 Types:
-  * Permanent (persistant)
-  * Transient (can be used by serveral sessions)
+  * Permanent (persistent)
+  * Transient (can be used by several sessions)
   * Temporary (local to a session)
 
 ## SCHEMAS
@@ -194,7 +196,7 @@ _CREATE TRANSIENT SCHEMA_
 _CREATE SCHEMA WITH MANAGED ACCESS_
 _ALTER SCHEMA ENABLE | DISABLE MANAGED ACCESS_
 
-When cloning a schema, all clustering keys and priviledges are clones as well.
+When cloning a schema, all clustering keys and privileges are clones as well.
 
 _ACCOUNT_USAGE_ schema has a latency between 45 min and 3 hours.
 
@@ -214,7 +216,7 @@ Dedicated metadata storage and customer-managed encryption are only available in
 
 VPS edition users have no access to Snowflake Marketplace.
 
-Dynamic data masking is only availabe on Enterprise or higher.
+Dynamic data masking is only available on Enterprise or higher.
 
 ## COMPLIANCE & FEDERATED ACCESS PROVISION
 
@@ -228,9 +230,9 @@ External functions hold the security related data in the API Keystore.
 
 Snowflake uses a hierarchical key model, rooted in a hardware key.
 
-Tri-secret secure system is only available from business critical edition.
-
 Tri-secret secure system : a composite encryption key made up of a user provider key and a Snowflake key.
+
+Tri-secret secure system is only available from business critical edition.
 
 There can be 1 or 2 public keys in a key pair.
 
@@ -254,7 +256,7 @@ Network policies are available for all editions.
 
 They set access filtering based on user's IP address.
 
-In order to create and set a network policy, we need to have global CREATE NETORK POLICY priviledge (available for SECURITYADMIN and higher).
+In order to create and set a network policy, we need to have global _CREATE NETWORK POLICY_ privilege (available for SECURITYADMIN and ACCOUNTADMIN).
 
 Can be set on an account and on a user (user's OWNERSHIP is also required).
 
